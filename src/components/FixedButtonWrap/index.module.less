@@ -1,0 +1,32 @@
+.actionWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  position: fixed;
+  bottom: 0px;
+  border-top: 1px solid #ccc;
+  background: white;
+  height: 90px;
+  line-height: 70px;
+  text-align: right;
+
+  :global {
+    .ant-btn {
+      width: 140px;
+      height: 48px;
+      line-height: 48px;
+      margin-right: 20px;
+    }
+  }
+}
+
+.collapsed {
+  width: calc(100% - 80px);
+  left: 80px;
+}
+
+.uncollapsed {
+  width: calc(100% - 256px);
+  left: 256px;
+}

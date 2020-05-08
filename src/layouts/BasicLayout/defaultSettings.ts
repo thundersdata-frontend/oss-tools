@@ -3,8 +3,8 @@
  * @公司: thundersdata
  * @作者: 陈杰
  * @Date: 2020-04-22 16:22:12
- * @LastEditors: 陈杰
- * @LastEditTime: 2020-04-26 16:49:00
+ * @LastEditors: 阮旭松
+ * @LastEditTime: 2020-05-08 11:42:21
  */
 import { Settings } from '@ant-design/pro-layout';
 
@@ -20,7 +20,7 @@ const defaultSettings: Partial<Settings> = {
     locale: true,
     defaultOpenAll: false,
   },
-  title: '中台模板'
+  title: 'OSS上传工具',
 };
 
 export default defaultSettings;

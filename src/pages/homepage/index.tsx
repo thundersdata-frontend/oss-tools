@@ -1,133 +1,100 @@
-import React, { useCallback } from 'react';
-import { Link, Access, useAccess, useRequest, useModel } from 'umi';
-import {
-  Button,
-  DatePicker,
-  Pagination,
-  TimePicker,
-  Transfer,
-  Calendar,
-  Table,
-} from 'antd';
-import moment from 'moment';
+import React, { useState } from 'react';
+import { Upload, message, Input } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Card } from '@td-design/web';
+import { UPLOAD_URL, access_token } from '@/pages/constant';
+import { UploadChangeParam } from 'antd/lib/upload';
+import { UploadFile } from 'antd/es/upload/interface';
+import styles from './index.module.less';
 
-const { RangePicker } = DatePicker;
+const { Dragger } = Upload;
 
-export default function Homepage() {
-  const access = useAccess();
+const UploadPage = () => {
+  const [fileId, setFileId] = useState<string>('');
+  const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
 
-  const { value, setValue, setEnums } = useModel('home');
-
-  /** 获取所有字典 */
-  useRequest(() => API.recruitment.dict.getAllDict.fetch(), {
-    onSuccess: (data) => {
-      setEnums(data);
-    },
-    onError: (error) => {
-      console.log(error.message);
-    },
-  });
-
-  const { run: run1 } = useRequest(
-    () =>
-      API.recruitment.interview.queryApplyingInterviewList.fetch({
-        page: 1,
-      }),
-    {
-      manual: true,
-      onError: (error) => {
-        console.log(error.message);
-      },
-    },
+  const UploadContent = () => (
+    <div className={styles.uploadContent}>
+      <PlusOutlined />
+      <p>点击或将文件拖拽到这里{fileId ? '替换原文件' : '上传'}</p>
+    </div>
   );
 
-  const fetchValue = useCallback(async () => {
-    if (value) {
-      const result = await API.recruitment.jobCategory.addJobCategory.fetch({
-        dictValue: value,
-      });
-      return result;
-    }
-    return API.recruitment.jobCategory.addJobCategory.init;
-  }, [value]);
+  // 公共上传配置
+  const commonProps = {
+    name: 'file',
+    multiple: false,
+    onRemove: (file: UploadFile<any>) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file: UploadFile<any>) => {
+      setFileList([...fileList, file]);
+      return true;
+    },
+    fileList,
+  };
 
-  useRequest(fetchValue, {
-    refreshDeps: [fetchValue],
-  });
+  // 上传配置
+  const uploadProps = {
+    ...commonProps,
+    action: `${UPLOAD_URL}/file/uploadToPub`,
+    data: {
+      access_token,
+    },
+    onChange(info: UploadChangeParam<UploadFile<any>>) {
+      const { response, status } = info.file;
+      if (status === 'done') {
+        message.success(
+          `${info.fileList[0].name} 上传成功！，fileId为:${response.data.fileId},链接为${response.data.url}`,
+        );
+        setFileList([]);
+      } else if (status === 'error') {
+        message.error(`${info.fileList[0].name} 上传失败，${response.message}`);
+      }
+    },
+  };
+
+  // 重写配置
+  const overrideProps = {
+    ...commonProps,
+    action: `${UPLOAD_URL}/file/override`,
+    data: {
+      fileId,
+      access_token,
+    },
+    onChange(info: UploadChangeParam<UploadFile<any>>) {
+      const { response, status } = info.file;
+      if (status === 'done') {
+        message.success(
+          `${info.fileList[0].name} 重写成功！,链接为:${UPLOAD_URL}/file/preview?fileId=${fileId}`,
+        );
+        setFileList([]);
+      } else if (status === 'error') {
+        message.error(`${info.fileList[0].name} 重写失败，${response.message}`);
+      }
+    },
+  };
 
   return (
     <div>
-      <div>
-        <Link to="/contacts">contacts</Link>
-      </div>
-      <div>
-        <Button type="primary">hello, antd</Button>
-      </div>
-      <div>
-        <Access
-          accessible={access.canRead}
-          fallback={<div>对不起，您没有权限查看此内容</div>}
-        >
-          你能看到我，说明你具有test权限
-        </Access>
-      </div>
-      <div>
-        <Access
-          accessible={access.canUpdate}
-          fallback={<div>对不起，您没有权限查看此内容</div>}
-        >
-          你能看到我，说明你具有hahaha权限
-        </Access>
-      </div>
-      <div>你能看到我，因为我对权限没有要求</div>
-      <div>
-        <DatePicker value={moment()} />
-        <TimePicker />
-        <RangePicker style={{ width: 200 }} />
-      </div>
-      <Pagination defaultCurrent={1} total={50} showSizeChanger />
-      <Transfer
-        dataSource={[]}
-        showSearch
-        targetKeys={[]}
-        render={(item) => item.title!}
-        listStyle={{ height: 250 }}
-      />
-      <Calendar fullscreen={false} />
-      <Table
-        dataSource={[]}
-        columns={[
-          {
-            title: 'Name',
-            dataIndex: 'name',
-            filters: [
-              {
-                text: 'filter1',
-                value: 'filter1',
-              },
-            ],
-          },
-          {
-            title: 'Age',
-            dataIndex: 'age',
-          },
-        ]}
-      />
-      <div style={{ fontSize: '20px', fontWeight: 600, marginTop: '100px' }}>
-        以下为pont+useRequest使用示例
-      </div>
-      <div style={{ color: 'red' }}>
-        如果要测试接口请求，请在global.ts中将services引入进来，并在pont-config.json中配置originUrl
-      </div>
-      <div>
-        originUrl地址为http://recruitment.test.thundersdata.com/v2/api-docs
-      </div>
-      <Button onClick={() => run1()}>手动执行get请求</Button>
-      <Button onClick={() => setValue('aaaa')}>
-        把value由undefined设置为a
-      </Button>
-      <Button onClick={() => setValue('bbbbb')}>value由aaa变成bbb</Button>
-      <div>value值：{value}</div>
+      <Card title="oss文件上传">
+        <div className={styles.cardContent}>
+          <div className={styles.fileInput}>
+            <span>文件ID:</span>
+            <Input value={fileId} onChange={(e) => setFileId(e.target.value)} />
+          </div>
+          <div className={styles.uploadWrap}>
+            <Dragger {...(fileId ? overrideProps : uploadProps)}>
+              <UploadContent />
+            </Dragger>
+          </div>
+        </div>
+      </Card>
     </div>
   );
-}
+};
+
+export default UploadPage;

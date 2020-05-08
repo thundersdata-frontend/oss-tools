@@ -11,6 +11,7 @@ import defaultSettings from './defaultSettings';
 import Logo from './components/Logo';
 import { ConfigProvider, Empty, Breadcrumb } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
+import { LayoutContext } from '@/pages/context';
 
 export default function BasicLayout(props: IRouteComponentProps) {
   const [collapsed, handleMenuCollapse] = useState<boolean>(false);
@@ -51,19 +52,34 @@ export default function BasicLayout(props: IRouteComponentProps) {
         />
       )}
     >
-      <ProLayout
-        logo={<Logo />}
-        collapsed={collapsed}
-        onCollapse={handleMenuCollapse}
-        menuHeaderRender={(logoDom, titleDom) => (
-          <Link to="/">
-            {logoDom}
-            {titleDom}
-          </Link>
-        )}
-        menuItemRender={(menuItemProps, defaultDom) => {
-          return (
-            <Link to={menuItemProps.path || '/'}>
+      <LayoutContext.Provider value={collapsed}>
+        <ProLayout
+          logo={<Logo />}
+          collapsed={collapsed}
+          onCollapse={handleMenuCollapse}
+          menuHeaderRender={(logoDom, titleDom) => (
+            <Link to="/">
+              {logoDom}
+              {titleDom}
+            </Link>
+          )}
+          menuItemRender={(menuItemProps, defaultDom) => {
+            return (
+              <Link to={menuItemProps.path || '/'}>
+                <span>
+                  {menuItemProps.customIcon && (
+                    <Iconfont
+                      name={menuItemProps.customIcon}
+                      style={{ marginRight: 10, fontSize: 17 }}
+                    />
+                  )}
+                </span>
+                <span>{defaultDom}</span>
+              </Link>
+            );
+          }}
+          subMenuItemRender={(menuItemProps, defaultDom) => {
+            return (
               <span>
                 {menuItemProps.customIcon && (
                   <Iconfont
@@ -71,47 +87,34 @@ export default function BasicLayout(props: IRouteComponentProps) {
                     style={{ marginRight: 10, fontSize: 17 }}
                   />
                 )}
+                <span>{defaultDom}</span>
               </span>
-              <span>{defaultDom}</span>
-            </Link>
-          );
-        }}
-        subMenuItemRender={(menuItemProps, defaultDom) => {
-          return (
-            <span>
-              {menuItemProps.customIcon && (
-                <Iconfont
-                  name={menuItemProps.customIcon}
-                  style={{ marginRight: 10, fontSize: 17 }}
-                />
-              )}
-              <span>{defaultDom}</span>
-            </span>
-          );
-        }}
-        rightContentRender={
-          (/** props: HeaderViewProps */) => <CustomHeaderRight />
-        }
-        onMenuHeaderClick={() => props.history.push('/')}
-        menuDataRender={menuDataRender}
-        {...settings}
-      >
-        {breadcrumbs.length > 0 && (
-          <Breadcrumb style={{ marginBottom: 16 }}>
-            {breadcrumbs.map((item) => (
-              <Breadcrumb.Item key={item.name}>
-                {item.link ? (
-                  <Link to={item.link}>{item.name}</Link>
-                ) : (
-                  <span>{item.name}</span>
-                )}
-              </Breadcrumb.Item>
-            ))}
-          </Breadcrumb>
-        )}
-        {props.children}
-      </ProLayout>
-      {/* <SettingDrawer settings={settings} onSettingChange={setSettings} /> */}
+            );
+          }}
+          rightContentRender={
+            (/** props: HeaderViewProps */) => <CustomHeaderRight />
+          }
+          onMenuHeaderClick={() => props.history.push('/')}
+          menuDataRender={menuDataRender}
+          {...settings}
+        >
+          {breadcrumbs.length > 0 && (
+            <Breadcrumb style={{ marginBottom: 16 }}>
+              {breadcrumbs.map((item) => (
+                <Breadcrumb.Item key={item.name}>
+                  {item.link ? (
+                    <Link to={item.link}>{item.name}</Link>
+                  ) : (
+                    <span>{item.name}</span>
+                  )}
+                </Breadcrumb.Item>
+              ))}
+            </Breadcrumb>
+          )}
+          {props.children}
+        </ProLayout>
+        {/* <SettingDrawer settings={settings} onSettingChange={setSettings} /> */}
+      </LayoutContext.Provider>
     </ConfigProvider>
   );
 }
