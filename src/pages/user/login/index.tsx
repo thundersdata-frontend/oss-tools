@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Alert, Checkbox } from 'antd';
 import { useRequest, Link } from 'umi';
 import LoginForm from '@/components/LoginForm';
-import { StateType, fakeAccountLogin, LoginParamsType } from '@/components/LoginForm/service';
+import {
+  StateType,
+  fakeAccountLogin,
+  LoginParamsType,
+} from '@/components/LoginForm/service';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginForm;
 
@@ -23,10 +27,13 @@ export default function Login() {
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
 
-  const { loading, data, run: submit } = useRequest<{ data: StateType }>(fakeAccountLogin, {
-    manual: true,
-    formatResult: (result) => result?.data,
-  });
+  const { loading, data, run: submit } = useRequest<{ data: StateType }>(
+    fakeAccountLogin,
+    {
+      manual: true,
+      formatResult: (result) => result?.data,
+    },
+  );
 
   const handleSubmit = (values: LoginParamsType) => {
     submit(values);
@@ -113,9 +120,7 @@ export default function Login() {
         <Submit loading={loading}>登录</Submit>
       </LoginForm>
       <div>
-        <Link to="/user/register">
-          还没有账户？去注册&gt;&gt;
-        </Link>
+        <Link to="/user/register">还没有账户？去注册&gt;&gt;</Link>
       </div>
     </div>
   );
