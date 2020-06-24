@@ -5,17 +5,36 @@
   align-items: center;
   justify-content: flex-start;
 
-  .fileInput {
+  .inputWrap {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
     align-self: flex-start;
-    margin-left: 16px;
 
-    span {
-      white-space: nowrap;
-      margin-right: 12px;
+    .fileInput,
+    .tokenInput {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      align-self: flex-start;
+      margin-left: 16px;
+
+      span {
+        white-space: nowrap;
+        margin-right: 12px;
+      }
     }
+
+    .tokenInput {
+      width: 400px;
+    }
+  }
+
+  .alertWrap {
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .messageWrap a {
+    margin-left: 12px;
   }
 
   .uploadWrap {
