@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, message, Input, Alert } from 'antd';
+import { Upload, message, Input, Alert, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Card } from '@td-design/web';
 import { UPLOAD_URL, access_token } from '@/pages/constant';
@@ -17,24 +17,17 @@ interface AlertProps {
   type: 'error' | 'info' | 'success' | 'warning';
 }
 
-// 初始化 alert 配置
-const INITIAL_ALERT_STATUS: AlertProps = Object.freeze({
-  /** 是否显示 */
-  visible: false,
-  /** alert 类型 */
-  type: 'success',
-  /** alert 提示信息 */
-  message: '',
-});
-
 const UploadPage = () => {
   const [fileId, setFileId] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
   const [accessToken, setAccessToken] = useState<string>(access_token);
-  const [alertStatusObj, setAlertStatusObj] = useImmer<AlertProps>(
-    INITIAL_ALERT_STATUS,
-  );
-  const { visible, type, message: alertMessage } = alertStatusObj;
+  const [alertStatusArr, setAlertStatusArr] = useState<AlertProps[]>([]);
+  const [spinObj, setSpinObj] = useImmer({
+    visible: false,
+    successCount: 0,
+    failedCount: 0,
+  });
+  const { visible: spinVisible, successCount, failedCount } = spinObj;
 
   const UploadContent = () => (
     <div className={styles.uploadContent}>
@@ -59,8 +52,8 @@ const UploadPage = () => {
       newFileList.splice(index, 1);
       setFileList(newFileList);
     },
-    beforeUpload: (file: UploadFile<any>) => {
-      setFileList([...fileList, file]);
+    beforeUpload: (_file: UploadFile<any>, newFileList: UploadFile<any>[]) => {
+      setFileList([...fileList, ...newFileList]);
       return true;
     },
     fileList,
@@ -73,38 +66,67 @@ const UploadPage = () => {
     data: {
       access_token: accessToken,
     },
+    multiple: true,
     onChange(info: UploadChangeParam<UploadFile<any>>) {
-      const { response, status } = info.file;
-      if (status === 'done') {
-        if (response.data) {
-          setAlertStatusObj((config) => {
-            config.visible = true;
-            config.type = 'success';
-            config.message = (
-              <div className={styles.messageWrap}>
-                {info.fileList[0].name}上传成功，fileId为:
-                {response.data.fileId}，链接为{response.data.url}
-                <a onClick={() => handleCopy(response.data.fileId)}>
-                  复制 fileId
-                </a>
-                <a onClick={() => handleCopy(response.data.url)}>复制地址</a>
-              </div>
-            );
-          });
-          setFileList([]);
-        } else {
-          setAlertStatusObj((config) => {
-            config.visible = true;
-            config.type = 'error';
-            config.message = '上传失败，请检查 access_token 是否有效';
-          });
+      const fileObj = {};
+      let successCount = 0;
+      let failedCount = 0;
+      const finishedCount = info.fileList.filter((item) => {
+        if (item.status === 'done') {
+          successCount += 1;
         }
-      } else if (status === 'error') {
-        setAlertStatusObj((config) => {
-          config.visible = true;
-          config.type = 'error';
-          config.message = `${info.fileList[0].name} 上传失败，${response.message}`;
+        if (item.status === 'error') {
+          failedCount += 1;
+        }
+        return item.status && item.status !== 'uploading';
+      }).length;
+      setSpinObj((config) => {
+        config.visible = true;
+        config.successCount = successCount;
+        config.failedCount = failedCount;
+      });
+      /** 是否完全上传完毕 */
+      if (finishedCount === info.fileList.length) {
+        setSpinObj((config) => {
+          config.visible = false;
         });
+        const alertArr = info.fileList.map((item) => {
+          const { response, status, name } = item;
+          const formattedFileName = name.replace(/(\..*)$/, '');
+          fileObj[formattedFileName] = response.data.url;
+          if (status === 'done') {
+            if (response.data) {
+              return {
+                visible: true,
+                type: 'success',
+                message: (
+                  <div className={styles.messageWrap}>
+                    {name}上传成功，fileId为:
+                    {response.data.fileId}，链接为{response.data.url}
+                    <a onClick={() => handleCopy(response.data.fileId)}>
+                      复制 fileId
+                    </a>
+                    <a onClick={() => handleCopy(response.data.url)}>
+                      复制地址
+                    </a>
+                  </div>
+                ),
+              };
+            }
+            return {
+              visible: true,
+              type: 'error',
+              message: '上传失败，请检查 access_token 是否有效',
+            };
+          }
+          return {
+            visible: true,
+            type: 'error',
+            message: `${name} 上传失败，${response.message}`,
+          };
+        });
+        console.log('上传文件结果：', JSON.stringify(fileObj));
+        setAlertStatusArr(alertArr as AlertProps[]);
       }
     },
   };
@@ -121,30 +143,40 @@ const UploadPage = () => {
       const { response, status } = info.file;
       if (status === 'done') {
         const fileUrl = `${UPLOAD_URL}/file/preview?fileId=${fileId}`;
-        setAlertStatusObj((config) => {
-          config.visible = true;
-          config.type = 'success';
-          config.message = `${info.fileList[0].name} 重写成功！,链接为:${UPLOAD_URL}/file/preview?fileId=${fileId}`;
-          config.message = (
-            <div className={styles.messageWrap}>
-              {info.fileList[0].name} 重写成功，链接为:{fileUrl}
-              <a onClick={() => handleCopy(fileUrl)}>复制地址</a>
-            </div>
-          );
-        });
+        setAlertStatusArr([
+          {
+            visible: true,
+            type: 'success',
+            message: (
+              <div className={styles.messageWrap}>
+                {info.fileList[0].name} 重写成功，链接为:{fileUrl}
+                <a onClick={() => handleCopy(fileUrl)}>复制地址</a>
+              </div>
+            ),
+          },
+        ]);
         setFileList([]);
       } else if (status === 'error') {
-        setAlertStatusObj((config) => {
-          config.visible = true;
-          config.type = 'error';
-          config.message = `${info.fileList[0].name} 重写失败，${response.message}`;
-        });
+        setAlertStatusArr([
+          {
+            visible: true,
+            type: 'error',
+            message: `${info.fileList[0].name} 重写失败，${response.message}`,
+          },
+        ]);
       }
     },
   };
 
+  /** 获得上传信息 */
+  const getSpinTip = () =>
+    `上传中${successCount && failedCount ? ',' : ''}${
+      successCount ? `已上传 ${successCount}个${failedCount ? ',' : ''}` : ''
+    } ${failedCount ? `上传失败 ${failedCount} 个` : ''}`;
+
   return (
     <div>
+      <Spin className={styles.spin} spinning={spinVisible} tip={getSpinTip()} />
       <Card title="oss文件上传">
         <div className={styles.cardContent}>
           <div className={styles.inputWrap}>
@@ -163,21 +195,27 @@ const UploadPage = () => {
               />
             </div>
           </div>
-          <div className={styles.alertWrap}>
-            {visible && (
+          {alertStatusArr.map((item, idx) => {
+            const { message, type } = item;
+            return (
               <Alert
-                message={alertMessage}
+                className={styles.alertWrap}
+                message={message}
                 type={type}
                 showIcon
                 closable
                 onClose={() => {
-                  setAlertStatusObj((config) => {
-                    config.visible = false;
+                  const modifiedArr = alertStatusArr.map((item, arrIdx) => {
+                    if (arrIdx === idx) {
+                      item.visible = false;
+                    }
+                    return item;
                   });
+                  setAlertStatusArr(modifiedArr);
                 }}
               />
-            )}
-          </div>
+            );
+          })}
           <div className={styles.uploadWrap}>
             <Dragger {...(fileId ? overrideProps : uploadProps)}>
               <UploadContent />
