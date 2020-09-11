@@ -40,7 +40,6 @@ export default function Login() {
   const { loading, data = {}, run: submit } = useRequest(fakeAccountLogin, {
     manual: true,
     onSuccess: (data) => {
-      console.log('data: ', data);
       saveToken(data.accessToken!);
       // refresh();
       history.replace('/homepage');
