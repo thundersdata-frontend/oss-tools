@@ -29,19 +29,10 @@ export default function Login() {
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
 
-  // const { loading, data, run: submit } = useRequest<{ data: StateType }>(
-  //   fakeAccountLogin,
-  //   {
-  //     manual: true,
-  //     formatResult: (result) => result?.data,
-  //   },
-  // );
-
   const { loading, data = {}, run: submit } = useRequest(fakeAccountLogin, {
     manual: true,
     onSuccess: (data) => {
       saveToken(data.accessToken!);
-      // refresh();
       history.replace('/homepage');
     },
     onError: (error) => message.error(error.message),
