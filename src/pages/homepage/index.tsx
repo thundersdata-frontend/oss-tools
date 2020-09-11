@@ -7,6 +7,7 @@ import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
 import { useImmer } from 'use-immer';
 import string from '@/utils/string';
+import date from '@/utils/date';
 import styles from './index.module.less';
 
 const { Dragger } = Upload;
@@ -21,13 +22,17 @@ const UploadPage = () => {
   const [fileId, setFileId] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
   const [alertStatusArr, setAlertStatusArr] = useState<AlertProps[]>([]);
+  const [accessToken, setAccessToken] = useState<string>(
+    localStorage.getItem('accessToken') || '',
+  );
   const [spinObj, setSpinObj] = useImmer({
     visible: false,
     successCount: 0,
     failedCount: 0,
   });
   const { visible: spinVisible, successCount, failedCount } = spinObj;
-  const accessToken = localStorage.getItem('accessToken');
+  console.log('successCount: ', successCount);
+  console.log('failedCount: ', failedCount);
 
   const UploadContent = () => (
     <div className={styles.uploadContent}>
@@ -125,7 +130,22 @@ const UploadPage = () => {
             message: `${name} 上传失败，${response.message}`,
           };
         });
-        console.log('上传文件结果：', JSON.stringify(fileObj));
+        const originHistoryList = JSON.parse(
+          localStorage.getItem('ossFileHistoryArr') || '[]',
+        );
+        console.log('fileObj: ', fileObj);
+        console.log('上传文件结果：', originHistoryList);
+        const newFileList = Object.keys(fileObj).map((key) => ({
+          fileName: key,
+          url: fileObj[key],
+          createAt: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+        }));
+        const totalHistoryList = originHistoryList.concat(newFileList);
+        localStorage.setItem(
+          'ossFileHistoryArr',
+          JSON.stringify(totalHistoryList),
+        );
+        console.log('totalHistoryList: ', totalHistoryList);
         setAlertStatusArr(alertArr as AlertProps[]);
       }
     },
@@ -170,7 +190,7 @@ const UploadPage = () => {
 
   /** 获得上传信息 */
   const getSpinTip = () =>
-    `上传中${successCount && failedCount ? ',' : ''}${
+    `上传中${successCount || failedCount ? ',' : ''}${
       successCount ? `已上传 ${successCount}个${failedCount ? ',' : ''}` : ''
     } ${failedCount ? `上传失败 ${failedCount} 个` : ''}`;
 
@@ -184,10 +204,20 @@ const UploadPage = () => {
               <span>文件ID:</span>
               <Input
                 value={fileId}
+                placeholder="输入 ID 以重写文件"
                 onChange={(e) => setFileId(e.target.value)}
               />
             </div>
+            <div className={styles.tokenInput}>
+              <span>access_token:</span>
+              <Input
+                placeholder="可以输入自己项目的 token 上传"
+                value={accessToken}
+                onChange={(e) => setAccessToken(e.target.value)}
+              />
+            </div>
           </div>
+
           {alertStatusArr.map((item, idx) => {
             const { message, type } = item;
             return (
