@@ -4,10 +4,10 @@
  * @作者: 陈杰
  * @Date: 2019-10-25 13:43:18
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-11 14:13:40
+ * @LastEditTime: 2020-09-11 15:54:48
  */
 import isEmpty from 'lodash/isEmpty';
-import { request, history } from 'umi';
+import { request } from 'umi';
 import { MenuDataItem } from '@ant-design/pro-layout';
 import arrayUtils from '@/utils/array';
 import { PrivilegeResource } from './interfaces/common';
@@ -52,8 +52,6 @@ export async function render(oldRender: Function) {
     } else {
       oldRender();
     }
-  } else {
-    history.replace('/user/login');
   }
 }
 

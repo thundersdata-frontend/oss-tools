@@ -33,7 +33,7 @@ export default function Login() {
     manual: true,
     onSuccess: (data) => {
       saveToken(data.accessToken!);
-      history.replace('/homepage');
+      history.push('/homepage');
     },
     onError: (error) => message.error(error.message),
   });
