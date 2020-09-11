@@ -4,7 +4,7 @@
  * @作者: 陈杰
  * @Date: 2019-10-25 13:43:18
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-11 15:54:48
+ * @LastEditTime: 2020-09-11 16:10:11
  */
 import isEmpty from 'lodash/isEmpty';
 import { request } from 'umi';
@@ -32,26 +32,23 @@ const privileges: string[] = [];
 export async function render(oldRender: Function) {
   const result = await request('/resource');
   const { code, success, data = [] } = result;
-  const accessToken = localStorage.getItem('accessToken');
-  if (accessToken) {
-    if (code === 20000 && success) {
-      const routes: PrivilegeResource[] = arrayUtils.deepOrder({
-        data,
-        childKey: 'children',
-        orderKey: 'orderValue',
-        type: 'asc',
-      });
-      const flatRoutes = arrayUtils.deepFlatten(routes);
-      flatRoutes.forEach((route) => {
-        privileges.push(...route.privilegeList);
-      });
-      // 将menus保存为应用的菜单、将privileges保存为应用的细粒度权限
-      serverRoutes = convertResourceToRoute(routes);
-      menus = convertResourceToMenu(routes);
-      oldRender();
-    } else {
-      oldRender();
-    }
+  if (code === 20000 && success) {
+    const routes: PrivilegeResource[] = arrayUtils.deepOrder({
+      data,
+      childKey: 'children',
+      orderKey: 'orderValue',
+      type: 'asc',
+    });
+    const flatRoutes = arrayUtils.deepFlatten(routes);
+    flatRoutes.forEach((route) => {
+      privileges.push(...route.privilegeList);
+    });
+    // 将menus保存为应用的菜单、将privileges保存为应用的细粒度权限
+    serverRoutes = convertResourceToRoute(routes);
+    menus = convertResourceToMenu(routes);
+    oldRender();
+  } else {
+    oldRender();
   }
 }
 
