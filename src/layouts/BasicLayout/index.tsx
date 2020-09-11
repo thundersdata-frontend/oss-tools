@@ -44,7 +44,9 @@ export default function BasicLayout(props: IRouteComponentProps) {
 
   if (!localStorage.getItem('accessToken')) {
     message.warning('请先登录！');
-    history.push('/');
+    setTimeout(() => {
+      history.replace('/user/login');
+    }, 1000);
   }
 
   return (
