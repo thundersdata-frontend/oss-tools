@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, message, Input, Alert, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Card } from '@td-design/web';
-import { UPLOAD_URL, access_token } from '@/pages/constant';
+import { UPLOAD_URL } from '@/pages/constant';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
 import { useImmer } from 'use-immer';
@@ -20,7 +20,6 @@ interface AlertProps {
 const UploadPage = () => {
   const [fileId, setFileId] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
-  const [accessToken, setAccessToken] = useState<string>(access_token);
   const [alertStatusArr, setAlertStatusArr] = useState<AlertProps[]>([]);
   const [spinObj, setSpinObj] = useImmer({
     visible: false,
@@ -28,6 +27,7 @@ const UploadPage = () => {
     failedCount: 0,
   });
   const { visible: spinVisible, successCount, failedCount } = spinObj;
+  const accessToken = localStorage.getItem('accessToken');
 
   const UploadContent = () => (
     <div className={styles.uploadContent}>
@@ -93,7 +93,7 @@ const UploadPage = () => {
         const alertArr = info.fileList.map((item) => {
           const { response, status, name } = item;
           const formattedFileName = name.replace(/(\..*)$/, '');
-          fileObj[formattedFileName] = response.data.url;
+          fileObj[formattedFileName] = response.data?.url;
           if (status === 'done') {
             if (response.data) {
               return {
@@ -187,18 +187,12 @@ const UploadPage = () => {
                 onChange={(e) => setFileId(e.target.value)}
               />
             </div>
-            <div className={styles.tokenInput}>
-              <span>access_token:</span>
-              <Input
-                value={accessToken}
-                onChange={(e) => setAccessToken(e.target.value)}
-              />
-            </div>
           </div>
           {alertStatusArr.map((item, idx) => {
             const { message, type } = item;
             return (
               <Alert
+                key={'' + message}
                 className={styles.alertWrap}
                 message={message}
                 type={type}

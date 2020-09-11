@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, Checkbox } from 'antd';
-import { useRequest, Link } from 'umi';
+import { Alert, Checkbox, message } from 'antd';
+import { useRequest, Link, history } from 'umi';
 import LoginForm from '@/components/LoginForm';
 import {
-  StateType,
   fakeAccountLogin,
   LoginParamsType,
 } from '@/components/LoginForm/service';
+import useAuth from '@/hooks/useAuth';
+import { LOGIN_TYPE } from '@/pages/constant';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginForm;
 
@@ -24,19 +25,37 @@ const LoginMessage: React.FC<{
 );
 
 export default function Login() {
+  const { saveToken } = useAuth();
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
 
-  const { loading, data, run: submit } = useRequest<{ data: StateType }>(
-    fakeAccountLogin,
-    {
-      manual: true,
-      formatResult: (result) => result?.data,
+  // const { loading, data, run: submit } = useRequest<{ data: StateType }>(
+  //   fakeAccountLogin,
+  //   {
+  //     manual: true,
+  //     formatResult: (result) => result?.data,
+  //   },
+  // );
+
+  const { loading, data = {}, run: submit } = useRequest(fakeAccountLogin, {
+    manual: true,
+    onSuccess: (data) => {
+      console.log('data: ', data);
+      saveToken(data.accessToken!);
+      // refresh();
+      history.replace('/homepage');
     },
-  );
+    onError: (error) => message.error(error.message),
+  });
 
   const handleSubmit = (values: LoginParamsType) => {
-    submit(values);
+    const { userName, ...rest } = values;
+    submit({
+      ...rest,
+      loginType: LOGIN_TYPE,
+      mobilePhone: values.mobile,
+      username: userName!,
+    });
   };
 
   const { status, type: loginType } = data || { status: 'ok', type: 'account' };

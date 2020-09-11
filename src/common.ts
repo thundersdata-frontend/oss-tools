@@ -4,6 +4,6 @@ import { extend, ExtendOptionsInit } from 'umi-request';
 export const commonRequestOptions: ExtendOptionsInit = {
   useCache: false,
   ttl: 60000,
-  credentials: 'include',
+  credentials: 'omit',
 };
 export const request = extend(commonRequestOptions);

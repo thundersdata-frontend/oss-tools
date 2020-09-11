@@ -1,7 +1,43 @@
 import { defineConfig } from 'umi';
+import routeConfig from './routeConfig';
 
 export default defineConfig({
-  chunks: ['vendors', 'umi'],
+  dynamicImport: {
+    loading: '@/components/Loading.tsx',
+  },
+  hash: true,
+  outputPath: 'build',
+  routes: routeConfig,
+  metas: [
+    { name: 'msapplication-TileColor', content: '#da532c' },
+    { name: 'theme-color', content: '#ffffff' },
+  ],
+  links: [
+    {
+      rel: 'apple-touch-icon',
+      sizes: '180x180',
+      href: '/apple-touch-icon.png',
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '32x32',
+      href: '/favicon-32x32.png',
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '16x16',
+      href: '/favicon-16x16.png',
+    },
+    { rel: 'manifest', href: '/site.webmanifest' },
+    { rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#5bbad5' },
+    {
+      rel: 'stylesheet',
+      href: '//at.alicdn.com/t/font_1509107_vaarx0n4zz.css',
+    },
+  ],
+  chunks: ['antd', 'vendors', 'umi'],
   chainWebpack(config) {
     config.merge({
       optimization: {
@@ -9,24 +45,28 @@ export default defineConfig({
         splitChunks: {
           chunks: 'all',
           minSize: 30000,
-          minChunks: 3,
+          minChunks: 1,
           automaticNameDelimiter: '.',
           cacheGroups: {
+            antd: {
+              name: 'antd',
+              test({ resource }) {
+                return /[\\/]node_modules[\\/](@ant-design|antd)[\\/]/.test(
+                  resource,
+                );
+              },
+              priority: -9,
+            },
             vendor: {
               name: 'vendors',
-              test({ resource }: unknown) {
+              test({ resource }) {
                 return /[\\/]node_modules[\\/]/.test(resource);
               },
-              priority: 10,
+              priority: -10,
             },
-            default: {
-              minChunks: 2,
-              priority: -20,
-              reuseExistingChunk: true
-            }
           },
         },
-      }
+      },
     });
   },
 });

@@ -3,8 +3,8 @@
  * @公司: thundersdata
  * @作者: 陈杰
  * @Date: 2020-04-26 20:43:30
- * @LastEditors: 陈杰
- * @LastEditTime: 2020-04-26 20:50:07
+ * @LastEditors: 阮旭松
+ * @LastEditTime: 2020-09-11 15:05:49
  */
 import { request } from '@/common';
 
@@ -21,11 +21,24 @@ export interface LoginParamsType {
   captcha: string;
 }
 
-export async function fakeAccountLogin(params: LoginParamsType) {
-  return request('/api/login/account', {
-    method: 'POST',
-    data: params,
-  });
+export interface LoginParams {
+  mobilePhone: string;
+  loginType: number;
+  username: string;
+}
+
+export async function fakeAccountLogin(params: LoginParams) {
+  // 暂时使用 maoyes 开发环境账号
+  return request(
+    'http://maoyes-base.dev.thundersdata.com/api/synergy/enterprise/user/login',
+    {
+      method: 'POST',
+      data: params,
+      headers: {
+        accessToken: localStorage.getItem('accessToken')!,
+      },
+    },
+  );
 }
 
 export async function getFakeCaptcha(mobile: string) {

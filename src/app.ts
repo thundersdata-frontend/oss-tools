@@ -3,11 +3,11 @@
  * @公司: thundersdata
  * @作者: 陈杰
  * @Date: 2019-10-25 13:43:18
- * @LastEditors: 陈杰
- * @LastEditTime: 2020-04-27 13:51:17
+ * @LastEditors: 阮旭松
+ * @LastEditTime: 2020-09-11 14:13:40
  */
 import isEmpty from 'lodash/isEmpty';
-import { request } from 'umi';
+import { request, history } from 'umi';
 import { MenuDataItem } from '@ant-design/pro-layout';
 import arrayUtils from '@/utils/array';
 import { PrivilegeResource } from './interfaces/common';
@@ -32,23 +32,28 @@ const privileges: string[] = [];
 export async function render(oldRender: Function) {
   const result = await request('/resource');
   const { code, success, data = [] } = result;
-  if (code === 20000 && success) {
-    const routes: PrivilegeResource[] = arrayUtils.deepOrder({
-      data,
-      childKey: 'children',
-      orderKey: 'orderValue',
-      type: 'asc',
-    });
-    const flatRoutes = arrayUtils.deepFlatten(routes);
-    flatRoutes.forEach((route) => {
-      privileges.push(...route.privilegeList);
-    });
-    // 将menus保存为应用的菜单、将privileges保存为应用的细粒度权限
-    serverRoutes = convertResourceToRoute(routes);
-    menus = convertResourceToMenu(routes);
-    oldRender();
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken) {
+    if (code === 20000 && success) {
+      const routes: PrivilegeResource[] = arrayUtils.deepOrder({
+        data,
+        childKey: 'children',
+        orderKey: 'orderValue',
+        type: 'asc',
+      });
+      const flatRoutes = arrayUtils.deepFlatten(routes);
+      flatRoutes.forEach((route) => {
+        privileges.push(...route.privilegeList);
+      });
+      // 将menus保存为应用的菜单、将privileges保存为应用的细粒度权限
+      serverRoutes = convertResourceToRoute(routes);
+      menus = convertResourceToMenu(routes);
+      oldRender();
+    } else {
+      oldRender();
+    }
   } else {
-    oldRender();
+    history.replace('/user/login');
   }
 }
 
@@ -79,12 +84,12 @@ export function patchRoutes(oldRoutes: { routes: Route[] }) {
 
 /** 初始化数据 */
 export async function getInitialState() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve({
       menus,
       privileges,
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -126,7 +131,7 @@ function convertResourceToRoute(list: PrivilegeResource[]): Route[] {
     return {
       path: item.apiUrl,
       component: require(`./pages${item.apiUrl}`).default,
-      title: item.description
+      title: item.description,
     };
   });
 }
