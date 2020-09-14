@@ -73,14 +73,6 @@ export default function BasicLayout(props: IRouteComponentProps) {
           menuItemRender={(menuItemProps, defaultDom) => {
             return (
               <Link to={menuItemProps.path || '/'}>
-                <span>
-                  {menuItemProps.customIcon && (
-                    <Iconfont
-                      name={menuItemProps.customIcon}
-                      style={{ marginRight: 10, fontSize: 17 }}
-                    />
-                  )}
-                </span>
                 <span>{defaultDom}</span>
               </Link>
             );

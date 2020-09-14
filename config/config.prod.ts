@@ -34,7 +34,7 @@ export default defineConfig({
     { rel: 'mask-icon', href: '/safari-pinned-tab.svg', color: '#5bbad5' },
     {
       rel: 'stylesheet',
-      href: '//at.alicdn.com/t/font_1509107_vaarx0n4zz.css',
+      href: '//at.alicdn.com/t/font_2066285_ku0x53lsm3.css',
     },
   ],
   chunks: ['antd', 'vendors', 'umi'],

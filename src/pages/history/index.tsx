@@ -4,20 +4,36 @@
  * @作者: 阮旭松
  * @Date: 2020-09-11 18:11:16
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-11 18:20:21
+ * @LastEditTime: 2020-09-14 15:16:21
  */
 
 import React, { useRef } from 'react';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import string from '@/utils/string';
 import { Store } from 'antd/es/form/interface';
 import TextEllipsis from '@/components/TextEllipsis';
-import { MAX_TABLE_LENGTH } from '../constant';
+import {
+  MAX_TABLE_LENGTH,
+  FILE_TYPE_MAP,
+  FILE_TYPE_ICON_MAP,
+} from '../constant';
+import Iconfont from '@/components/Iconfont';
 
 export default () => {
   const dataSource = JSON.parse(
     localStorage.getItem('ossFileHistoryArr') || '[]',
   );
-  console.log('dataSource: ', dataSource);
+
+  const getFileType = (item: Store) => {
+    // 文件后缀
+    const fileSuffix =
+      '.' + string.getLastSubstring(item.url, '.').toLowerCase();
+    return (
+      Object.keys(FILE_TYPE_MAP).find((type) =>
+        FILE_TYPE_MAP[type].includes(fileSuffix),
+      ) || '文件'
+    );
+  };
   const actionRef = useRef<ActionType>();
   const columns: ProColumns<Store>[] = [
     {
@@ -34,11 +50,30 @@ export default () => {
     {
       title: '文件预览',
       dataIndex: 'preview',
-      align: 'left',
+      align: 'center',
       copyable: false,
       valueType: 'text',
       hideInSearch: true,
-      render: (_, row) => row.url && <img alt="文件预览" src={row.url} />,
+      render: (_, row) => {
+        const fileType = getFileType(row);
+        if (fileType === '图片') {
+          return (
+            <img
+              width={200}
+              alt="文件预览"
+              src={row.url}
+              style={{ cursor: 'pointer' }}
+              onClick={() => window.open(row.url)}
+            />
+          );
+        }
+        return (
+          <Iconfont
+            name={FILE_TYPE_ICON_MAP[fileType]}
+            style={{ color: '#333', fontSize: 26 }}
+          />
+        );
+      },
     },
     {
       title: '文件链接',
@@ -47,9 +82,15 @@ export default () => {
       copyable: false,
       valueType: 'text',
       hideInSearch: true,
-      render: (_, row) => (
-        <TextEllipsis text={row.url} maxLength={MAX_TABLE_LENGTH} />
-      ),
+    },
+    {
+      title: '文件类型',
+      dataIndex: 'type',
+      align: 'left',
+      copyable: false,
+      valueType: 'text',
+      hideInSearch: true,
+      render: (_, row) => getFileType(row),
     },
   ];
   return (
