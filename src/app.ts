@@ -4,10 +4,10 @@
  * @作者: 陈杰
  * @Date: 2019-10-25 13:43:18
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-11 16:10:11
+ * @LastEditTime: 2020-09-12 19:36:01
  */
 import isEmpty from 'lodash/isEmpty';
-import { request } from 'umi';
+import mockData from '../mock/route';
 import { MenuDataItem } from '@ant-design/pro-layout';
 import arrayUtils from '@/utils/array';
 import { PrivilegeResource } from './interfaces/common';
@@ -30,15 +30,15 @@ const privileges: string[] = [];
  * @param oldRender
  */
 export async function render(oldRender: Function) {
-  const result = await request('/resource');
+  const result = await mockData['/resource'];
   const { code, success, data = [] } = result;
   if (code === 20000 && success) {
-    const routes: PrivilegeResource[] = arrayUtils.deepOrder({
+    const routes = (arrayUtils.deepOrder({
       data,
       childKey: 'children',
       orderKey: 'orderValue',
       type: 'asc',
-    });
+    }) as unknown) as PrivilegeResource[];
     const flatRoutes = arrayUtils.deepFlatten(routes);
     flatRoutes.forEach((route) => {
       privileges.push(...route.privilegeList);
