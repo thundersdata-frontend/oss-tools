@@ -31,8 +31,6 @@ const UploadPage = () => {
     failedCount: 0,
   });
   const { visible: spinVisible, successCount, failedCount } = spinObj;
-  console.log('successCount: ', successCount);
-  console.log('failedCount: ', failedCount);
 
   const UploadContent = () => (
     <div className={styles.uploadContent}>
@@ -133,7 +131,6 @@ const UploadPage = () => {
         const originHistoryList = JSON.parse(
           localStorage.getItem('ossFileHistoryArr') || '[]',
         );
-        console.log('fileObj: ', fileObj);
         console.log('上传文件结果：', originHistoryList);
         const newFileList = Object.keys(fileObj).map((key) => ({
           fileName: key,
@@ -145,7 +142,6 @@ const UploadPage = () => {
           'ossFileHistoryArr',
           JSON.stringify(totalHistoryList),
         );
-        console.log('totalHistoryList: ', totalHistoryList);
         setAlertStatusArr(alertArr as AlertProps[]);
       }
     },
