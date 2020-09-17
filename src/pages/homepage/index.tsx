@@ -94,7 +94,10 @@ const UploadPage = () => {
         const alertArr = info.fileList.map((item) => {
           const { response, status, name } = item;
           const formattedFileName = name.replace(/(\..*)$/, '');
-          fileObj[formattedFileName] = response.data?.url;
+          fileObj[formattedFileName] = {
+            url: response.data?.url,
+            fileId: response.data.fileId,
+          };
           if (status === 'done') {
             if (response.data) {
               return {
@@ -132,7 +135,8 @@ const UploadPage = () => {
         console.log('上传文件结果：', originHistoryList);
         const newFileList = Object.keys(fileObj).map((key) => ({
           fileName: key,
-          url: fileObj[key],
+          url: fileObj[key].url,
+          fileId: fileObj[key].fileId,
           createAt: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
         }));
         const totalHistoryList = originHistoryList.concat(newFileList);

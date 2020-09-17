@@ -4,7 +4,7 @@
  * @作者: 阮旭松
  * @Date: 2020-09-11 18:11:16
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-14 15:16:21
+ * @LastEditTime: 2020-09-17 11:58:10
  */
 
 import React, { useRef } from 'react';
@@ -36,6 +36,14 @@ export default () => {
   };
   const actionRef = useRef<ActionType>();
   const columns: ProColumns<Store>[] = [
+    {
+      title: '文件Id',
+      dataIndex: 'fileId',
+      align: 'left',
+      copyable: false,
+      valueType: 'text',
+      hideInSearch: true,
+    },
     {
       title: '文件名称',
       dataIndex: 'fileName',
