@@ -18,6 +18,13 @@ interface AlertProps {
   type: 'error' | 'info' | 'success' | 'warning';
 }
 
+interface fileItemProps {
+  fileName: string;
+  url: string;
+  fileId: string;
+  createAt: string;
+}
+
 const UploadPage = () => {
   const [fileId, setFileId] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
@@ -93,8 +100,7 @@ const UploadPage = () => {
         });
         const alertArr = info.fileList.map((item) => {
           const { response, status, name } = item;
-          const formattedFileName = name.replace(/(\..*)$/, '');
-          fileObj[formattedFileName] = {
+          fileObj[name] = {
             url: response.data?.url,
             fileId: response.data.fileId,
           };
@@ -159,8 +165,25 @@ const UploadPage = () => {
     },
     onChange(info: UploadChangeParam<UploadFile<any>>) {
       const { response, status } = info.file;
+      const { name } = info.fileList[0] || {};
       if (status === 'done') {
         const fileUrl = `${UPLOAD_URL}/file/preview?fileId=${fileId}`;
+
+        const originHistoryList: fileItemProps[] = JSON.parse(
+          localStorage.getItem('ossFileHistoryArr') || '[]',
+        );
+        const newFileList = originHistoryList.map((item) => {
+          if ('' + item.fileId === fileId) {
+            return {
+              ...item,
+              fileName: name,
+              url: fileUrl,
+            };
+          }
+          return item;
+        });
+        localStorage.setItem('ossFileHistoryArr', JSON.stringify(newFileList));
+
         setAlertStatusArr([
           {
             visible: true,

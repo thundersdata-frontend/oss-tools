@@ -4,7 +4,7 @@
  * @作者: 阮旭松
  * @Date: 2020-09-11 18:11:16
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-17 11:58:10
+ * @LastEditTime: 2020-09-17 13:38:29
  */
 
 import React, { useRef } from 'react';
@@ -27,7 +27,7 @@ export default () => {
   const getFileType = (item: Store) => {
     // 文件后缀
     const fileSuffix =
-      '.' + string.getLastSubstring(item.url, '.').toLowerCase();
+      '.' + string.getLastSubstring(item.fileName, '.').toLowerCase();
     return (
       Object.keys(FILE_TYPE_MAP).find((type) =>
         FILE_TYPE_MAP[type].includes(fileSuffix),
