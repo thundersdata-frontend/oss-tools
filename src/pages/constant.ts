@@ -4,7 +4,7 @@
  * @作者: 阮旭松
  * @Date: 2020-05-08 14:23:36
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-14 15:16:53
+ * @LastEditTime: 2020-09-17 10:36:14
  */
 
 export const UPLOAD_URL = 'http://object-service.dev.thundersdata.com';
@@ -12,11 +12,8 @@ export const UPLOAD_URL = 'http://object-service.dev.thundersdata.com';
 /** 登录方式：用户名 */
 export const LOGIN_TYPE = 0;
 
-/** 初始登录账号密码 */
-export const LOGIN_INFO = {
-  userName: 'maoyes222',
-  password: '123456',
-};
+/** 默认用微信电商小程序开发环境 token */
+export const ACCESS_TOKEN = '223bc111017d323b00fee4cf9c59a2be';
 
 /** 表格中最大显示字数 */
 export const MAX_TABLE_LENGTH = 15;

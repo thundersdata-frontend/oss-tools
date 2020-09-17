@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload, message, Input, Alert, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Card } from '@td-design/web';
-import { UPLOAD_URL } from '@/pages/constant';
+import { UPLOAD_URL, ACCESS_TOKEN } from '@/pages/constant';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
 import { useImmer } from 'use-immer';
@@ -22,9 +22,7 @@ const UploadPage = () => {
   const [fileId, setFileId] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
   const [alertStatusArr, setAlertStatusArr] = useState<AlertProps[]>([]);
-  const [accessToken, setAccessToken] = useState<string>(
-    localStorage.getItem('accessToken') || '',
-  );
+  const [accessToken, setAccessToken] = useState<string>(ACCESS_TOKEN);
   const [spinObj, setSpinObj] = useImmer({
     visible: false,
     successCount: 0,

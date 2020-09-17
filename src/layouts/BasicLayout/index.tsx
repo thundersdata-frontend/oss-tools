@@ -4,12 +4,12 @@ import ProLayout, {
   MenuDataItem,
   getMenuData,
 } from '@ant-design/pro-layout';
-import { IRouteComponentProps, Link, useModel, history } from 'umi';
+import { IRouteComponentProps, Link, useModel } from 'umi';
 import Iconfont from '@/components/Iconfont';
 import CustomHeaderRight from './components/CustomHeaderRight';
 import defaultSettings from './defaultSettings';
 import Logo from './components/Logo';
-import { ConfigProvider, Empty, Breadcrumb, message } from 'antd';
+import { ConfigProvider, Empty, Breadcrumb } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
 import { LayoutContext } from '@/pages/context';
 
@@ -40,13 +40,6 @@ export default function BasicLayout(props: IRouteComponentProps) {
         link: index === 0 ? parentKeys[index] : undefined,
       }));
     }
-  }
-
-  if (!localStorage.getItem('accessToken')) {
-    message.warning('请先登录！');
-    setTimeout(() => {
-      history.replace('/user/login');
-    }, 1000);
   }
 
   return (

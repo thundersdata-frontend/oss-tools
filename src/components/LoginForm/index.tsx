@@ -4,7 +4,7 @@
  * @作者: 陈杰
  * @Date: 2020-04-26 16:31:35
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-11 15:04:13
+ * @LastEditTime: 2020-09-17 10:32:53
  */
 import React, { useState, useEffect } from 'react';
 import { FormInstance } from 'antd/es/form';
@@ -16,7 +16,6 @@ import { Form, Tabs } from 'antd';
 import classNames from 'classnames';
 import { LoginParamsType } from './service';
 import styles from './index.less';
-import { LOGIN_INFO } from '@/pages/constant';
 
 export interface LoginProps {
   activeKey?: string;
@@ -103,7 +102,6 @@ const LoginForm: LoginType = ({
           onFinish={(values) => {
             onSubmit && onSubmit(values as LoginParamsType);
           }}
-          initialValues={LOGIN_INFO}
         >
           {tabs.length ? (
             <React.Fragment>

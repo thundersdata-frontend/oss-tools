@@ -11,7 +11,7 @@ export default [
     path: '/',
     component: '@/layouts/BasicLayout',
     routes: [
-      { path: '/', redirect: '/user/login' },
+      { path: '/', redirect: '/homepage' },
       { path: '/history', component: './history' },
       { path: '/homepage', component: './homepage' },
       { path: '*', component: './404' },
