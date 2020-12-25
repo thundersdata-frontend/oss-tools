@@ -29,6 +29,7 @@ const UploadPage = () => {
   const [fileId, setFileId] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile<any>[]>([]);
   const [alertStatusArr, setAlertStatusArr] = useState<AlertProps[]>([]);
+  const [uploadUrl, setUploadUrl] = useState<string>(UPLOAD_URL);
   const [accessToken, setAccessToken] = useState<string>(ACCESS_TOKEN);
   const [spinObj, setSpinObj] = useImmer({
     visible: false,
@@ -70,87 +71,91 @@ const UploadPage = () => {
   // 上传配置
   const uploadProps = {
     ...commonProps,
-    action: `${UPLOAD_URL}/file/uploadToPub`,
+    action: `${uploadUrl}/file/uploadToPub`,
     data: {
       access_token: accessToken,
     },
     multiple: true,
     onChange(info: UploadChangeParam<UploadFile<any>>) {
-      const fileObj = {};
-      let successCount = 0;
-      let failedCount = 0;
-      const finishedCount = info.fileList.filter((item) => {
-        if (item.status === 'done') {
-          successCount += 1;
-        }
-        if (item.status === 'error') {
-          failedCount += 1;
-        }
-        return item.status && item.status !== 'uploading';
-      }).length;
-      setSpinObj((config) => {
-        config.visible = true;
-        config.successCount = successCount;
-        config.failedCount = failedCount;
-      });
-      /** 是否完全上传完毕 */
-      if (finishedCount === info.fileList.length) {
+      try {
+        const fileObj = {};
+        let successCount = 0;
+        let failedCount = 0;
+        const finishedCount = info.fileList.filter((item) => {
+          if (item.status === 'done') {
+            successCount += 1;
+          }
+          if (item.status === 'error') {
+            failedCount += 1;
+          }
+          return item.status && item.status !== 'uploading';
+        }).length;
         setSpinObj((config) => {
-          config.visible = false;
+          config.visible = true;
+          config.successCount = successCount;
+          config.failedCount = failedCount;
         });
-        const alertArr = info.fileList.map((item) => {
-          const { response, status, name } = item;
-          fileObj[name] = {
-            url: response.data?.url,
-            fileId: response.data.fileId,
-          };
-          if (status === 'done') {
-            if (response.data) {
+        /** 是否完全上传完毕 */
+        if (finishedCount === info.fileList.length) {
+          setSpinObj((config) => {
+            config.visible = false;
+          });
+          const alertArr = info.fileList.map((item) => {
+            const { response, status, name } = item;
+            fileObj[name] = {
+              url: response.data?.url,
+              fileId: response.data?.fileId,
+            };
+            if (status === 'done') {
+              if (response.data) {
+                return {
+                  visible: true,
+                  type: 'success',
+                  message: (
+                    <div className={styles.messageWrap}>
+                      {name}上传成功，fileId为:
+                      {response.data.fileId}，链接为{response.data.url}
+                      <a onClick={() => handleCopy(response.data.fileId)}>
+                        复制 fileId
+                      </a>
+                      <a onClick={() => handleCopy(response.data.url)}>
+                        复制地址
+                      </a>
+                    </div>
+                  ),
+                };
+              }
               return {
                 visible: true,
-                type: 'success',
-                message: (
-                  <div className={styles.messageWrap}>
-                    {name}上传成功，fileId为:
-                    {response.data.fileId}，链接为{response.data.url}
-                    <a onClick={() => handleCopy(response.data.fileId)}>
-                      复制 fileId
-                    </a>
-                    <a onClick={() => handleCopy(response.data.url)}>
-                      复制地址
-                    </a>
-                  </div>
-                ),
+                type: 'error',
+                message: '上传失败，请检查 access_token 是否有效',
               };
             }
             return {
               visible: true,
               type: 'error',
-              message: '上传失败，请检查 access_token 是否有效',
+              message: `${name} 上传失败，${response.message}`,
             };
-          }
-          return {
-            visible: true,
-            type: 'error',
-            message: `${name} 上传失败，${response.message}`,
-          };
-        });
-        const originHistoryList = JSON.parse(
-          localStorage.getItem('ossFileHistoryArr') || '[]',
-        );
-        console.log('上传文件结果：', originHistoryList);
-        const newFileList = Object.keys(fileObj).map((key) => ({
-          fileName: key,
-          url: fileObj[key].url,
-          fileId: fileObj[key].fileId,
-          createAt: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
-        }));
-        const totalHistoryList = originHistoryList.concat(newFileList);
-        localStorage.setItem(
-          'ossFileHistoryArr',
-          JSON.stringify(totalHistoryList),
-        );
-        setAlertStatusArr(alertArr as AlertProps[]);
+          });
+          const originHistoryList = JSON.parse(
+            localStorage.getItem('ossFileHistoryArr') || '[]',
+          );
+          console.log('上传文件结果：', originHistoryList);
+          const newFileList = Object.keys(fileObj).map((key) => ({
+            fileName: key,
+            url: fileObj[key].url,
+            fileId: fileObj[key].fileId,
+            createAt: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+          }));
+          const totalHistoryList = originHistoryList.concat(newFileList);
+          localStorage.setItem(
+            'ossFileHistoryArr',
+            JSON.stringify(totalHistoryList),
+          );
+          setAlertStatusArr(alertArr as AlertProps[]);
+        }
+      } catch (err) {
+        message.error(err.message);
       }
     },
   };
@@ -158,7 +163,7 @@ const UploadPage = () => {
   // 重写配置
   const overrideProps = {
     ...commonProps,
-    action: `${UPLOAD_URL}/file/override`,
+    action: `${uploadUrl}/file/override`,
     data: {
       fileId,
       access_token: accessToken,
@@ -167,7 +172,7 @@ const UploadPage = () => {
       const { response, status } = info.file;
       const { name } = info.fileList[0] || {};
       if (status === 'done') {
-        const fileUrl = `${UPLOAD_URL}/file/preview?fileId=${fileId}`;
+        const fileUrl = `${uploadUrl}/file/preview?fileId=${fileId}`;
 
         const originHistoryList: fileItemProps[] = JSON.parse(
           localStorage.getItem('ossFileHistoryArr') || '[]',
@@ -235,6 +240,14 @@ const UploadPage = () => {
                 placeholder="可以输入自己项目的 token 上传"
                 value={accessToken}
                 onChange={(e) => setAccessToken(e.target.value)}
+              />
+            </div>
+            <div className={styles.tokenInput}>
+              <span>上传域名:</span>
+              <Input
+                placeholder="可以输入自己项目的域名"
+                value={uploadUrl}
+                onChange={(e) => setUploadUrl(e.target.value)}
               />
             </div>
           </div>
