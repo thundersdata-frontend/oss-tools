@@ -140,13 +140,13 @@ const UploadPage = () => {
           const originHistoryList = JSON.parse(
             localStorage.getItem('ossFileHistoryArr') || '[]',
           );
-          console.log('上传文件结果：', originHistoryList);
           const newFileList = Object.keys(fileObj).map((key) => ({
             fileName: key,
             url: fileObj[key].url,
             fileId: fileObj[key].fileId,
             createAt: date.formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
           }));
+          console.log('上传文件结果：', newFileList);
           const totalHistoryList = originHistoryList.concat(newFileList);
           localStorage.setItem(
             'ossFileHistoryArr',
