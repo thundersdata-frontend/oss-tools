@@ -102,6 +102,13 @@ const UploadPage = () => {
           });
           const alertArr = info.fileList.map((item) => {
             const { response, status, name } = item;
+            if (!response) {
+              return {
+                visible: true,
+                type: 'error',
+                message: '上传失败，服务异常',
+              };
+            }
             fileObj[name] = {
               url: response.data?.url,
               fileId: response.data?.fileId,

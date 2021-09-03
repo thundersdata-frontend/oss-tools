@@ -4,7 +4,7 @@
  * @作者: 阮旭松
  * @Date: 2020-09-11 18:11:16
  * @LastEditors: 阮旭松
- * @LastEditTime: 2020-09-17 13:38:29
+ * @LastEditTime: 2021-09-03 17:47:37
  */
 
 import React, { useRef } from 'react';
@@ -22,7 +22,7 @@ import Iconfont from '@/components/Iconfont';
 export default () => {
   const dataSource = JSON.parse(
     localStorage.getItem('ossFileHistoryArr') || '[]',
-  );
+  ).reverse();
 
   const getFileType = (item: Store) => {
     // 文件后缀
