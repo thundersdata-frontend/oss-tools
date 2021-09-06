@@ -47,7 +47,6 @@
     "@ant-design/icons": "^4.0.6",
     "@ant-design/pro-layout": "^5.0.9",
     "@ant-design/pro-table": "^2.2.6",
-    "@td-design/web": "^2.3.16",
     "@umijs/hooks": "^1.9.2",
     "@umijs/preset-react": "1.x",
     "antd": "^4.2.0",

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Upload, message, Input, Alert, Spin } from 'antd';
+import { Upload, message, Input, Alert, Spin, Card } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { Card } from '@td-design/web';
 import { UPLOAD_URL, ACCESS_TOKEN } from '@/pages/constant';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
@@ -230,7 +229,7 @@ const UploadPage = () => {
   return (
     <div>
       <Spin className={styles.spin} spinning={spinVisible} tip={getSpinTip()} />
-      <Card title="oss文件上传">
+      <Card title={<div className={styles.titleWrap}>oss文件上传</div>}>
         <div className={styles.cardContent}>
           <div className={styles.inputWrap}>
             <div className={styles.fileInput}>
