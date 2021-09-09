@@ -184,7 +184,7 @@ const UploadPage = () => {
           localStorage.getItem('ossFileHistoryArr') || '[]',
         );
         const newFileList = originHistoryList.map((item) => {
-          if ('' + item.fileId === fileId) {
+          if (`${  item.fileId}` === fileId) {
             return {
               ...item,
               fileName: name,
@@ -262,7 +262,7 @@ const UploadPage = () => {
             const { message, type } = item;
             return (
               <Alert
-                key={'' + message}
+                key={idx}
                 className={styles.alertWrap}
                 message={message}
                 type={type}

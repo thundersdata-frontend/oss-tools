@@ -1,16 +1,16 @@
 {
-  "name": "spa-template",
+  "name": "oss-tools",
   "version": "1.0.0",
-  "description": "杭州雷数前端中后台管理系统模板",
+  "description": "杭州雷数前端oss上传工具",
   "license": "MIT",
-  "author": "陈杰 <chenjie@thundersdata.com>",
-  "homepage": "https://github.com/thundersdata-frontend/spa-template#readme",
+  "author": "阮旭松 <ruanxusong@thundersdata.com>",
+  "homepage": "https://github.com/thundersdata-frontend/oss-tools#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thundersdata-frontend/spa-template.git"
+    "url": "git+https://github.com/thundersdata-frontend/oss-tools.git"
   },
   "bugs": {
-    "url": "https://github.com/thundersdata-frontend/spa-template/issues"
+    "url": "https://github.com/thundersdata-frontend/oss-tools/issues"
   },
   "scripts": {
     "commit": "git-cz",
@@ -45,11 +45,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.0.6",
-    "@ant-design/pro-layout": "^5.0.9",
-    "@ant-design/pro-table": "^2.2.6",
+    "@ant-design/pro-layout": "5.0.10",
+    "@ant-design/pro-table": "2.2.7",
     "@umijs/hooks": "^1.9.2",
     "@umijs/preset-react": "1.x",
-    "antd": "^4.2.0",
+    "antd": "4.2.0",
     "classnames": "^2.2.6",
     "dayjs": "^1.8.25",
     "lodash": "^4.17.15",
@@ -83,12 +83,15 @@
     "cz-customizable": "^6.2.0",
     "eslint": "^6.7.0",
     "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-flowtype": "^4.5.2",
     "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^24.4.0",
     "eslint-plugin-jsx-a11y": "^6.2.2",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^3.0.0",
+    "eslint-plugin-unicorn": "^35.0.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.1.6",
     "pont-engine": "^1.0.3",

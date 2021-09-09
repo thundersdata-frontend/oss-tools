@@ -27,7 +27,7 @@ export default () => {
   const getFileType = (item: Store) => {
     // 文件后缀
     const fileSuffix =
-      '.' + string.getLastSubstring(item.fileName, '.').toLowerCase();
+      `.${  string.getLastSubstring(item.fileName, '.').toLowerCase()}`;
     return (
       Object.keys(FILE_TYPE_MAP).find((type) =>
         FILE_TYPE_MAP[type].includes(fileSuffix),
